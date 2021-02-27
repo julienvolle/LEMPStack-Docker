@@ -1,0 +1,46 @@
+version: '3'
+
+volumes:
+  portainer_volume:
+    external: false
+
+services:
+
+  ##
+  ## DATABASE MANAGER
+  ##
+  db_manager:
+    image: phpmyadmin
+    container_name: db_manager
+    ports:
+      - "${LOCAL_PORT_DB_MANAGER:-8081}:80"
+    networks:
+      - app_network
+    restart: always
+
+  ##
+  ## CACHE MANAGER
+  ##
+  cache_manager:
+    image: jacksoncage/phpmemcachedadmin
+    container_name: cache_manager
+    ports:
+      - "${LOCAL_PORT_CACHE_MANAGER:-8082}:80"
+    networks:
+      - app_network
+    restart: always
+
+  ##
+  ## DOCKER MANAGER
+  ##
+  docker_manager:
+    image: portainer/portainer
+    container_name: docker_manager
+    ports:
+      - "${LOCAL_PORT_DOCKER_MANAGER:-8083}:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_volume:/data portainer/portainer-ce
+    networks:
+      - app_network
+    restart: always
